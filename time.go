@@ -72,11 +72,11 @@ func main() {
 	// Setup a UDP connection
 	conn, err := net.Dial("udp", host)
 	if err != nil {
-		log.Fatal("failed to connect:", err)
+		log.Fatalf("failed to connect:", err)
 	}
 	defer conn.Close()
 	if err := conn.SetDeadline(time.Now().Add(15 * time.Second)); err != nil {
-		log.Fatal("failed to set deadline: ", err)
+		log.Fatalf("failed to set deadline: %v", err)
 	}
 	// configure request settings by specifying the first byte as
 	// 00 011 011 (or 0x1B)
