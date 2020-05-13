@@ -72,7 +72,7 @@ func main() {
 	// Setup a UDP connection
 	conn, err := net.Dial("udp", host)
 	if err != nil {
-		log.Fatalf("failed to connect:", err)
+		log.Fatalf("failed to connect: %v", err)
 	}
 	defer conn.Close()
 	if err := conn.SetDeadline(time.Now().Add(15 * time.Second)); err != nil {
