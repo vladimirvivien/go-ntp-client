@@ -20,9 +20,7 @@ func main() {
 	flag.Parse()
 
 	args := strings.SplitN(host, ":", 2)
-	c := ntp.Client{Server: args[0], Port: args[1]}
-
-	time, err := c.Time()
+	time, err := ntp.GetTime(ntp.Options{Server: args[0], Port: args[1]})
 	if err != nil {
 		log.Fatal(err)
 	}

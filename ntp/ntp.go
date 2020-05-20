@@ -58,15 +58,15 @@ type packet struct {
 }
 
 // Client allows callers to configure server & port for NTP sync
-type Client struct {
+type Options struct {
 	Server string
 	Port   string
 }
 
 // Time returns the current time from the specified NTP server
-func (c Client) Time() (time.Time, error) {
+func GetTime(opts Options) (time.Time, error) {
 	// Setup a UDP connection
-	conn, err := net.Dial("udp", c.Server+":"+c.Port)
+	conn, err := net.Dial("udp", opts.Server+":"+opts.Port)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("failed to connect: %v", err)
 	}
