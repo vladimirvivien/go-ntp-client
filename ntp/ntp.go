@@ -68,20 +68,12 @@ func (c Client) Time() (time.Time, error) {
 	// Setup a UDP connection
 	conn, err := net.Dial("udp", c.Server+":"+c.Port)
 	if err != nil {
-<<<<<<< HEAD:ntp/ntp.go
 		return time.Time{}, fmt.Errorf("failed to connect: %v", err)
 	}
 	defer conn.Close()
 	if err := conn.SetDeadline(
 		time.Now().Add(15 * time.Second)); err != nil {
 		return time.Time{}, fmt.Errorf("failed to set deadline: %v", err)
-=======
-		log.Fatalf("failed to connect: %v", err)
-	}
-	defer conn.Close()
-	if err := conn.SetDeadline(time.Now().Add(15 * time.Second)); err != nil {
-		log.Fatalf("failed to set deadline: %v", err)
->>>>>>> upstream/master:time.go
 	}
 
 	// configure request settings by specifying the first byte as
