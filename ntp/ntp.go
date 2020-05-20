@@ -63,14 +63,6 @@ type Client struct {
 	Port   string
 }
 
-func Time() (time.Time, error) {
-	c := Client{
-		Server: "us.pool.ntp.org",
-		Port:   "123",
-	}
-	return c.Time()
-}
-
 // TimeWithOptions returns the current time from the specified NTP server
 func (c Client) Time() (time.Time, error) {
 	// Setup a UDP connection
