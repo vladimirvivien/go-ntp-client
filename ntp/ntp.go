@@ -1,3 +1,4 @@
+// Package ntp provides a very simple go client for retrieving time from an NTP server
 package ntp
 
 import (
@@ -57,13 +58,13 @@ type packet struct {
 	TxTimeFrac     uint32 // transmit time frac
 }
 
-// Client allows callers to configure server & port for NTP sync
+// Options allows callers to configure server & port for NTP sync
 type Options struct {
 	Server string
 	Port   string
 }
 
-// Time returns the current time from the specified NTP server
+// GetTime returns the current time from the specified NTP server
 func GetTime(opts Options) (time.Time, error) {
 	// Setup a UDP connection
 	conn, err := net.Dial("udp", opts.Server+":"+opts.Port)
