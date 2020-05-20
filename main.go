@@ -20,6 +20,9 @@ func main() {
 	flag.Parse()
 
 	args := strings.SplitN(host, ":", 2)
+	if len(args) > 2 {
+		log.Fatalf("Port appears to have not been specificed. Example: %v", "us.pool.ntp.org:123")
+	}
 	time, err := ntp.GetTime(ntp.Options{Server: args[0], Port: args[1]})
 	if err != nil {
 		log.Fatal(err)
