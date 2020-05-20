@@ -57,13 +57,13 @@ type packet struct {
 	TxTimeFrac     uint32 // transmit time frac
 }
 
-// Options allows callers to configure server & port for NTP sync
+// Client allows callers to configure server & port for NTP sync
 type Client struct {
 	Server string
 	Port   string
 }
 
-// TimeWithOptions returns the current time from the specified NTP server
+// Time returns the current time from the specified NTP server
 func (c Client) Time() (time.Time, error) {
 	// Setup a UDP connection
 	conn, err := net.Dial("udp", c.Server+":"+c.Port)
