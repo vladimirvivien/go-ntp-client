@@ -1,10 +1,8 @@
-package main
+package ntp
 
 import (
 	"encoding/binary"
-	"flag"
 	"fmt"
-	"log"
 	"net"
 	"time"
 )
@@ -59,25 +57,33 @@ type packet struct {
 	TxTimeFrac     uint32 // transmit time frac
 }
 
-// This program implements a trivial NTP client over UDP.
-//
-// Usage:
-// time -e <host endpoint as addr:port>
-//
-func main() {
-	var host string
-	flag.StringVar(&host, "e", "us.pool.ntp.org:123", "NTP host")
-	flag.Parse()
+// Options allows callers to configure server & port for NTP sync
+type Client struct {
+	Server string
+	Port   string
+}
 
+func Time() (time.Time, error) {
+	c := Client{
+		Server: "us.pool.ntp.org",
+		Port:   "123",
+	}
+	return c.Time()
+}
+
+// TimeWithOptions returns the current time from the specified NTP server
+func (c Client) Time() (time.Time, error) {
 	// Setup a UDP connection
-	conn, err := net.Dial("udp", host)
+	conn, err := net.Dial("udp", c.Server+":"+c.Port)
 	if err != nil {
-		log.Fatal("failed to connect:", err)
+		return time.Time{}, fmt.Errorf("failed to connect: %v", err)
 	}
 	defer conn.Close()
-	if err := conn.SetDeadline(time.Now().Add(15 * time.Second)); err != nil {
-		log.Fatal("failed to set deadline: ", err)
+	if err := conn.SetDeadline(
+		time.Now().Add(15 * time.Second)); err != nil {
+		return time.Time{}, fmt.Errorf("failed to set deadline: %v", err)
 	}
+
 	// configure request settings by specifying the first byte as
 	// 00 011 011 (or 0x1B)
 	// |  |   +-- client mode (3)
@@ -87,13 +93,13 @@ func main() {
 
 	// send time request
 	if err := binary.Write(conn, binary.BigEndian, req); err != nil {
-		log.Fatalf("failed to send request: %v", err)
+		return time.Time{}, fmt.Errorf("failed to send request: %v", err)
 	}
 
 	// block to receive server response
 	rsp := &packet{}
 	if err := binary.Read(conn, binary.BigEndian, rsp); err != nil {
-		log.Fatalf("failed to read server response: %v", err)
+		return time.Time{}, fmt.Errorf("failed to read server response: %v", err)
 	}
 
 	// On POSIX-compliant OS, time is expressed
@@ -103,6 +109,7 @@ func main() {
 	// to Unix time by removing 70 yrs of seconds (1970-1900)
 	// or 2208988800 seconds.
 	secs := float64(rsp.TxTimeSec) - ntpEpochOffset
-	nanos := (int64(rsp.TxTimeFrac) * 1e9) >> 32 // convert fractional to nanos
-	fmt.Printf("%v\n", time.Unix(int64(secs), nanos))
+	nanos := (int64(rsp.TxTimeFrac) * 1e9) >> 32
+
+	return time.Unix(int64(secs), nanos), nil
 }
